@@ -1,41 +1,46 @@
 // src/App.js
-
 import React, { useState, useEffect } from 'react';
-import { database } from './firebase';
-import { ref, onValue, set } from 'firebase/database';
+import { onAuthStateChanged } from 'firebase/auth';
+import { ref, onValue } from 'firebase/database';
+import { auth, database } from './firebase/firebaseConfig';
+import Login from './components/Login';
+import Accounts from './components/Accounts';
+import Transactions from './components/Transactions';
 
-const App = () => {
-  const [message, setMessage] = useState('');
+function App() {
+  const [user, setUser] = useState(null);
+  const [accounts, setAccounts] = useState({});
 
   useEffect(() => {
-    const messageRef = ref(database, 'message');
-
-    const unsubscribe = onValue(messageRef, (snapshot) => {
-      const newMessage = snapshot.val();
-      setMessage(newMessage);
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        const accountsRef = ref(database, `users/${currentUser.uid}/accounts`);
+        const unsubscribeAccounts = onValue(accountsRef, (snapshot) => {
+          setAccounts(snapshot.val() || {});
+        });
+        return () => unsubscribeAccounts();
+      } else {
+        setAccounts({});
+      }
     });
 
-    // Unsubscribe from the listener when the component unmounts
-    return unsubscribe;
+    return () => unsubscribeAuth();
   }, []);
 
-  const updateMessage = (newMessage) => {
-	console.log(newMessage); // Add this to check if the function is called
-	  set(ref(database, 'message'), newMessage);
-  };
-
   return (
-    <div>
-      <h1>Realtime Hello World</h1>
-      <input
-        type="text"
-        value={message}
-        onChange={(e) => updateMessage(e.target.value)}
-      />
-      <p>{message}</p>
+    <div className="App">
+      {user ? (
+        <>
+          <Accounts userId={user.uid} accounts={accounts} setAccounts={setAccounts} />
+          <Transactions userId={user.uid} accounts={accounts} />
+          {/* Add a logout button or link */}
+        </>
+      ) : (
+        <Login />
+      )}
     </div>
   );
-};
+}
 
 export default App;
-
