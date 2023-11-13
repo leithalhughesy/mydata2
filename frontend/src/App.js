@@ -1,45 +1,67 @@
 // src/App.js
 import React, { useState, useEffect } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { ref, onValue } from 'firebase/database';
 import { auth, database } from './firebase/firebaseConfig';
+import Header from './components/Header';
+import Home from './components/Home';
+import Finances from './components/Finances';
+import ToDo from './components/ToDo';
+import Notes from './components/Notes';
+import { MainContent } from './components/StyledComponents';
 import Login from './components/Login';
-import Accounts from './components/Accounts';
-import Transactions from './components/Transactions';
 
 function App() {
   const [user, setUser] = useState(null);
   const [accounts, setAccounts] = useState({});
 
+  // Monitor auth state and fetch accounts when user logs in
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
+        // Fetch accounts
         const accountsRef = ref(database, `users/${currentUser.uid}/accounts`);
-        const unsubscribeAccounts = onValue(accountsRef, (snapshot) => {
+        onValue(accountsRef, (snapshot) => {
           setAccounts(snapshot.val() || {});
         });
-        return () => unsubscribeAccounts();
       } else {
         setAccounts({});
       }
     });
 
-    return () => unsubscribeAuth();
+    // Cleanup function to unsubscribe from the auth listener on component unmount
+    return unsubscribeAuth;
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+  };
+
   return (
-    <div className="App">
-      {user ? (
-        <>
-          <Accounts userId={user.uid} accounts={accounts} setAccounts={setAccounts} />
-          <Transactions userId={user.uid} accounts={accounts} />
-          {/* Add a logout button or link */}
-        </>
-      ) : (
-        <Login />
-      )}
-    </div>
+    <Router>
+      <div className="App">
+        <Header user={user} onLogout={handleLogout} />
+        <MainContent>
+          {user ? (
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/finances" element={user ? <Finances user={user} accounts={accounts} setAccounts={setAccounts} /> : <Login />}/>
+              <Route path="/todo" element={<ToDo />} />
+              <Route path="/notes" element={<Notes />} />
+            </Routes>
+          ) : (
+            <Login />
+          )}
+        </MainContent>
+      </div>
+    </Router>
   );
 }
 
