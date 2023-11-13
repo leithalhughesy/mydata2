@@ -5,29 +5,34 @@ import { database, auth } from '../firebase/firebaseConfig';
 import { addNote, updateNote, deleteNote } from '../firebase/firebaseUtils';
 import NoteTree from './NoteTree';
 import { DragDropContext } from 'react-beautiful-dnd';
-import { NotesLayout, Sidebar, MainPane, NoteButton, Input, Title } from './StyledComponents';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // import styles
+import {
+  NotesContainer,
+  SidebarContainer,
+  NoteEditorContainer,
+  NoteTitleInput,
+  NoteActionButton,
+  EditorStyles,
+  NoteCard,
+} from './StyledComponents';
+import 'react-quill/dist/quill.snow.css'; // Import styles
 
 const Notes = () => {
   const [notes, setNotes] = useState([]);
   const [selectedNoteId, setSelectedNoteId] = useState(null);
   const [editorContent, setEditorContent] = useState('');
   const [noteTitle, setNoteTitle] = useState('');
-
+  const selectedNote = notes.find((note) => note.id === selectedNoteId);
+  
   useEffect(() => {
-    const currentUser = auth.currentUser;
-    if (!currentUser) return;
-
-    const notesRef = ref(database, `users/${currentUser.uid}/notes`);
+    if (!auth.currentUser) return;
+    
+    const notesRef = ref(database, `users/${auth.currentUser.uid}/notes`);
     const unsubscribe = onValue(notesRef, (snapshot) => {
       const data = snapshot.val();
-      const loadedNotes = data
-        ? Object.keys(data).map((key) => ({
+      const loadedNotes = data ? Object.keys(data).map((key) => ({
             id: key,
             ...data[key],
-          }))
-        : [];
+          })) : [];
       setNotes(loadedNotes);
     });
 
@@ -35,7 +40,7 @@ const Notes = () => {
   }, []);
 
   const onDragEnd = (result) => {
-    // TODO: Handle reordering logic
+    // Handle reordering logic
   };
 
   const handleNoteUpdate = async () => {
@@ -43,16 +48,16 @@ const Notes = () => {
       await updateNote(auth.currentUser.uid, selectedNoteId, { title: noteTitle, content: editorContent });
     } else {
       await addNote(auth.currentUser.uid, { title: noteTitle, content: editorContent });
-      setNoteTitle('');
-      setEditorContent('');
+      setNoteTitle('Unsaved Note');
+      setEditorContent('Unsaved Content');
     }
   };
 
   const handleNoteSelect = (noteId) => {
     setSelectedNoteId(noteId);
     const note = notes.find((note) => note.id === noteId);
-    setEditorContent(note.content);
-    setNoteTitle(note.title);
+    setEditorContent(note.content || '');
+    setNoteTitle(note.title || '');
   };
 
   const handleNoteDelete = async (noteId) => {
@@ -64,32 +69,36 @@ const Notes = () => {
     }
   };
 
-  const selectedNote = notes.find((note) => note.id === selectedNoteId);
-
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <NotesLayout>
-        <Sidebar>
-          <Title>Notes</Title>
-          <NoteButton onClick={handleNoteUpdate}>Add Note</NoteButton>
+      <NotesContainer>
+        <SidebarContainer>
+          <NoteTitleInput
+            type="text"
+            value={noteTitle}
+            onChange={(e) => setNoteTitle(e.target.value)}
+            placeholder="Note Title"
+            autoFocus
+          />
+          <NoteActionButton onClick={() => handleNoteUpdate(null)}>Add Note</NoteActionButton>
           <NoteTree notes={notes} setSelectedNoteId={handleNoteSelect} />
-        </Sidebar>
-        <MainPane>
+        </SidebarContainer>
+        <NoteEditorContainer>
           {selectedNote && (
-            <>
-              <Input
-                type="text"
-                value={noteTitle}
-                onChange={(e) => setNoteTitle(e.target.value)}
-                placeholder="Note Title"
+            <NoteCard>
+              <EditorStyles
+                theme="snow"
+                value={editorContent}
+                onChange={setEditorContent}
               />
-              <ReactQuill value={editorContent} onChange={setEditorContent} />
-              <NoteButton onClick={handleNoteUpdate}>Save</NoteButton>
-              <NoteButton onClick={() => handleNoteDelete(selectedNote.id)}>Delete</NoteButton>
-            </>
+              <div>
+                <NoteActionButton onClick={handleNoteUpdate}>Save</NoteActionButton>
+                <NoteActionButton onClick={() => handleNoteDelete(selectedNote.id)}>Delete</NoteActionButton>
+              </div>
+            </NoteCard>
           )}
-        </MainPane>
-      </NotesLayout>
+        </NoteEditorContainer>
+      </NotesContainer>
     </DragDropContext>
   );
 };

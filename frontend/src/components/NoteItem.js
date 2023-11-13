@@ -1,21 +1,13 @@
 // src/components/NoteItem.js
 import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import styled from 'styled-components';
-
-const ItemContainer = styled.div`
-  border: 1px solid lightgrey;
-  border-radius: 2px;
-  padding: 8px;
-  margin-bottom: 8px;
-  background-color: ${(props) => (props.isDragging ? 'lightgreen' : 'white')};
-`;
+import { NoteItemContainer } from './StyledComponents';
 
 const NoteItem = ({ note, index, setSelectedNoteId }) => {
     return (
       <Draggable draggableId={note.id} index={index}>
         {(provided, snapshot) => (
-          <ItemContainer
+          <NoteItemContainer
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
@@ -23,7 +15,7 @@ const NoteItem = ({ note, index, setSelectedNoteId }) => {
             onClick={() => setSelectedNoteId(note.id)}
           >
             {note.title || 'Untitled Note'} 
-          </ItemContainer>
+          </NoteItemContainer>
         )}
       </Draggable>
     );

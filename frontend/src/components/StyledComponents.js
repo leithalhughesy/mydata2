@@ -1,4 +1,6 @@
 import styled from 'styled-components';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; // import styles
 
 export const Container = styled.div`
   max-width: 1200px;
@@ -43,20 +45,19 @@ export const Button = styled.button`
   }
 `;
 
-export const Title = styled.h1`
+export const Title = styled.h3`
   color: #CCD6F6;
   margin-bottom: 20px;
 `;
 
 export const Input = styled.input`
-  background-color: #112240; /* Darker background for the input */
-  color: #57c2ec; /* Bright color for the text */
-  border: 1px solid #57c2ec; /* Lighter border color */
+  width: 100%; /* Full width */
+  padding: 10px 15px;
+  margin-bottom: 10px; /* Space below the input field */
   border-radius: 4px;
-  padding: 10px;
-  font-size: 16px;
-  margin-bottom: 20px;
-  margin-right: 10px;
+  border: 1px solid #57c2ec;
+  background-color: #020c1b; /* A darker background for the input */
+  color: #fff; /* White text */
   
   &::placeholder {
     color: #8892B0;
@@ -64,9 +65,10 @@ export const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #52EAC9; /* A lighter border color for focus state */
+    border-color: #52EAC9;
   }
 `;
+
 
 export const Select = styled.select`
   background-color: #112240; /* Darker background for the dropdown */
@@ -272,17 +274,96 @@ export const NoteCard = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 `;
 
-// Optionally, if you have a button that you use frequently, you can create a styled button component as well
-export const NoteButton = styled.button`
-  background-color: #57c2ec; /* Bright color for the button */
-  color: #0A192F;
-  border: none;
+
+export const NotesContainer = styled.div`
+  display: flex;
+  height: calc(100vh - 50px); // Adjust based on your actual header's height
+  background-color: #0A192F; // This should match the main theme of your app
+  // Add more styling as needed
+`;
+
+export const SidebarContainer = styled.div`
+  width: 250px; // Or whatever width you prefer
+  background-color: #112240; // This should match the sidebar's theme
+  padding: 20px;
+  overflow-y: auto; // If you have more notes, it will be scrollable
+  // Add more styling as needed
+`;
+
+export const NoteEditorContainer = styled.div`
+  flex-grow: 1;
+  padding: 20px;
+  // Add more styling as needed
+`;
+
+export const NoteTitleInput = styled.input`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px; // Space below the input field
   border-radius: 4px;
-  padding: 10px 20px;
+  border: 1px solid #57c2ec; // Border color should match your theme
+  background-color: #020c1b; // A darker background for the input
+  color: #fff; // White text color for better readability
+  font-size: 1.2em; // Larger font size for the note title
+
+  &:focus {
+    outline: none;
+    border-color: #52EAC9; // Highlight color when focused
+  }
+  // Add more styling as needed
+`;
+
+export const NoteActionButton = styled.button`
+  background-color: #57c2ec; // Button color should match your theme
+  color: #0A192F; // Text color that contrasts with the button color
+  border: none;
+  padding: 10px 15px;
+  margin-right: 10px; // Space between buttons
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #52EAC9; // Color change on hover
+  }
+  // Add more styling as needed
+`;
+
+export const EditorStyles = styled(ReactQuill)`
+  .ql-container {
+    height: 70vh; // Adjust the height as needed
+    border: none; // No border for the editor
+  }
+
+  .ql-editor {
+    padding: 20px;
+    background-color: #020c1b; // Matching the theme's background color
+    color: #CCD6F6; // Text color for readability
+    border-radius: 4px;
+    height: 100%;
+    overflow-y: auto; // Make the editor scrollable
+  }
+  // Add more styling as needed
+`;
+
+// Update your NoteItem component to use this styled component for better appearance
+export const NoteItemContainer = styled.div`
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: ${(props) => (props.isSelected ? '#57c2ec' : '#112240')};
+  color: #CCD6F6;
+  border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #52EAC9; /* A slightly lighter color for hover state */
+    background-color: #52EAC9;
   }
+`;
+
+export const NoteList = styled.div`
+  padding: 8px;
+  background-color: ${(props) => (props.isSelected ? '#57c2ec' : '#112240')};
+  color: #CCD6F6;
 `;
