@@ -10,9 +10,9 @@ import {
   SidebarContainer,
   NoteEditorContainer,
   NoteTitleInput,
-  NoteActionButton,
   EditorStyles,
   NoteCard,
+  Button,
 } from './StyledComponents';
 import 'react-quill/dist/quill.snow.css'; // Import styles
 
@@ -80,7 +80,7 @@ const Notes = () => {
             placeholder="Note Title"
             autoFocus
           />
-          <NoteActionButton onClick={() => handleNoteUpdate(null)}>Add Note</NoteActionButton>
+          <Button onClick={() => handleNoteUpdate(null)}>Add Note</Button>
           <NoteTree notes={notes} setSelectedNoteId={handleNoteSelect} />
         </SidebarContainer>
         <NoteEditorContainer>
@@ -92,8 +92,8 @@ const Notes = () => {
                 onChange={setEditorContent}
               />
               <div>
-                <NoteActionButton onClick={handleNoteUpdate}>Save</NoteActionButton>
-                <NoteActionButton onClick={() => handleNoteDelete(selectedNote.id)}>Delete</NoteActionButton>
+                <Button onClick={handleNoteUpdate}>Save</Button>
+                <Button onClick={() => handleNoteDelete(selectedNote.id)}>Delete</Button>
               </div>
             </NoteCard>
           )}
