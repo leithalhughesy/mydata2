@@ -27,7 +27,7 @@ export const NavItem = styled.li`
     text-decoration: none;
     transition: color 0.3s ease;
     &:hover {
-      color: #52EAC9; // A lighter shade for hover state
+      color: #81d1f0; // A lighter shade for hover state
     }
   }
 `;
@@ -42,7 +42,7 @@ export const Button = styled.button`
   cursor: pointer;
   transition: background-color 0.3s ease;
   &:hover {
-    background-color: #52EAC9;
+    background-color: #81d1f0;
   }
 `;
 
@@ -66,7 +66,7 @@ export const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #52EAC9;
+    border-color: #81d1f0;
   }
 `;
 
@@ -87,7 +87,7 @@ export const Select = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #52EAC9; /* A lighter border color for focus state */
+    border-color: #81d1f0; /* A lighter border color for focus state */
   }
 `;
 
@@ -117,6 +117,7 @@ export const Option = styled.option`
 export const Card = styled.div`
   background-color: #112240; /* Dark blue card background */
   border-radius: 10px;
+  height: 100%;
   padding: 20px;
   margin: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* subtle shadow for depth */
@@ -174,11 +175,12 @@ export const TableContainer = styled.div`
 `;
 
 export const MainContent = styled.main`
-  padding: 40px; /* Or whatever padding you prefer */
+  padding: 40px; /* Keep existing padding */
+  padding-top: 150px; /* Add padding-top to account for the fixed header */
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center children horizontally */
-  gap: 20px; /* Spacing between child components */
+  align-items: center;
+  gap: 20px;
 `;
 
 export const Dropdown = styled.div`
@@ -227,16 +229,21 @@ export const ProfileImage = styled.img`
   width: 50px; // You can adjust the size as needed
   height: 50px;
   border-radius: 50%;
-  border: 2px solid #64FFDA;
+  border: 2px solid #57c2ec;
 `;
 
 export const HeaderLH = styled.header`
-background-color: #0A192F;
-color: #64FFDA;
-padding: 10px 20px;
-text-align: center;
-font-size: 1.5rem;
-border-bottom: 3px solid #64FFDA;
+  background-color: #0A192F;
+  color: #57c2ec;
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 1.5rem;
+  border-bottom: 3px solid #57c2ec;
+  position: fixed; /* Add this line to make the header fixed */
+  top: 0; /* Align to the top */
+  left: 0; /* Align to the left */
+  right: 0; /* Align to the right */
+  z-index: 10; /* Ensure it's above other elements */
 `;
 
 export const DivCenter = styled.div`
@@ -278,7 +285,7 @@ export const NoteCard = styled.div`
 
 export const NotesContainer = styled.div`
   display: flex;
-  height: calc(100vh - 50px); // Adjust based on your actual header's height
+  height: 100%;
   background-color: #0A192F; // This should match the main theme of your app
   // Add more styling as needed
 `;
@@ -309,7 +316,7 @@ export const NoteTitleInput = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #52EAC9; // Highlight color when focused
+    border-color: #81d1f0; // Highlight color when focused
   }
   // Add more styling as needed
 `;
@@ -326,14 +333,14 @@ export const NoteActionButton = styled.button`
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #52EAC9; // Color change on hover
+    background-color: #81d1f0; // Color change on hover
   }
   // Add more styling as needed
 `;
 
 export const EditorStyles = styled(ReactQuill)`
   .ql-container {
-    height: 70vh; // Adjust the height as needed
+    height: 100%;
     border: none; // No border for the editor
   }
 
@@ -359,7 +366,7 @@ export const NoteItemContainer = styled.div`
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #52EAC9;
+    background-color: #81d1f0;
   }
 `;
 

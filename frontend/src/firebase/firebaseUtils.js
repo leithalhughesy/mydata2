@@ -24,7 +24,8 @@ export const updateTransaction = (userId, transactionId, transactionUpdate) => {
 // Notes
 export const addNote = (userId, note) => {
   const newNoteRef = push(ref(database, `users/${userId}/notes`));
-  return set(newNoteRef, note);
+  set(newNoteRef, note);
+  return newNoteRef; // Return the reference to the new note
 };
 
 export const updateNote = (userId, noteId, noteUpdate) => {
@@ -33,4 +34,18 @@ export const updateNote = (userId, noteId, noteUpdate) => {
 
 export const deleteNote = (userId, noteId) => {
   return remove(ref(database, `users/${userId}/notes/${noteId}`));
+};
+
+export const updateNoteOrderInFirebase = async (userId, reorderedNotes) => {
+  const updates = {};
+  reorderedNotes.forEach((note, index) => {
+      const noteKey = note.id; // Assuming 'id' is the Firebase key for the note
+      updates[`/users/${userId}/notes/${noteKey}/order`] = index;
+  });
+
+  try {
+      await update(ref(database), updates); // Perform the update
+  } catch (error) {
+      console.error("Error updating note order: ", error);
+  }
 };

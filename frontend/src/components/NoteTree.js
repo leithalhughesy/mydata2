@@ -2,12 +2,11 @@
 import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 import NoteItem from './NoteItem';
-import { Sidebar, Title, NoteList } from './StyledComponents';
+import { Sidebar, NoteList } from './StyledComponents';
 
-const NoteTree = ({ notes, setNotes, setSelectedNoteId }) => {
+const NoteTree = ({ notes, setSelectedNoteId }) => {
   return (
     <Sidebar>
-      <Title>Note Categories</Title>
       <Droppable droppableId="noteTree">
         {(provided, snapshot) => (
           <NoteList
