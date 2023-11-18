@@ -119,8 +119,10 @@ export const Card = styled.div`
   border-radius: 10px;
   height: 100%;
   padding: 20px;
-  margin: 20px;
+  margin: 0; // Remove the margin to allow grid-gap to handle spacing
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* subtle shadow for depth */
+  // Remove flex property to allow grid to handle the size
+  // Remove max-width property to allow grid to handle the size
 `;
 
 export const Table = styled.table`
@@ -374,4 +376,73 @@ export const NoteList = styled.div`
   padding: 8px;
   background-color: ${(props) => (props.isSelected ? '#57c2ec' : '#112240')};
   color: #CCD6F6;
+`;
+
+export const ModalContainer = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width:100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+`;
+
+export const ModalContent = styled.div`
+  position: fixed;
+  background: #112240;
+  width: 300px;
+  height: auto;
+  top:50%;
+  left:50%;
+  transform: translate(-50%,-50%);
+  padding: 20px;
+  border-radius: 8px;
+`;
+
+export const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+`;
+
+export const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const Label = styled.label`
+  margin-bottom: 5px;
+`;
+
+export const ModalInput = styled.input`
+  margin-bottom: 10px;
+`;
+
+export const ModalSelect = styled.select`
+  margin-bottom: 10px;
+`;
+
+export const ModalButton = styled.button`
+  background-color: #57c2ec;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+`;
+
+export const AccountsContainer = styled.div`
+  display: grid;
+  grid-gap: 20px; // Adjust this value as needed
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); // Adjust minmax as needed, smaller value will allow more items in a row
+  justify-content: center; // This centers the grid items in the container when there's extra space
+  padding: 0 20px; // Add padding to the left and right
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr; // On smaller screens, use a single column layout
+  }
+
+  // Adjust max-width to allow the grid to stretch more, but not too wide
+  max-width: 1920px; // Allow the grid container to take up to 90% of the screen width
+  margin: 0 auto; // Center the container
 `;

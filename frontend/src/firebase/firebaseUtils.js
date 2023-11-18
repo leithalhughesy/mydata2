@@ -7,6 +7,10 @@ export const addAccount = (userId, account) => {
   return set(newAccountRef, account);
 };
 
+export const deleteAccount = (userId, accountId) => {
+  return remove(ref(database, `users/${userId}/accounts/${accountId}`));
+};
+
 export const updateAccount = (userId, accountId, accountUpdate) => {
   return update(ref(database, `users/${userId}/accounts/${accountId}`), accountUpdate);
 };
@@ -49,3 +53,4 @@ export const updateNoteOrderInFirebase = async (userId, reorderedNotes) => {
       console.error("Error updating note order: ", error);
   }
 };
+
