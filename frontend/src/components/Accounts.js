@@ -1,7 +1,7 @@
 // src/components/Accounts.js
 import React, { useState } from 'react';
 import { addAccount, deleteAccount, updateAccount } from '../firebase/firebaseUtils';
-import { Button, Input, Card, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Select, AccountsContainer } from './StyledComponents';
+import { Button, Input, Card, Table, Thead, Tbody, Tr, Th, Td, TrH, TableContainer, Select, AccountsContainer } from './StyledComponents';
 import EditAccountModal from './EditAccountModal';
 
 const Accounts = ({ userId, accounts, setAccounts }) => {
@@ -11,7 +11,15 @@ const Accounts = ({ userId, accounts, setAccounts }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState(null);
   
-  const openEditModal = (account) => {
+    // Add the formatting function
+    const formatCurrency = (amount) => {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(amount);
+    };
+  
+    const openEditModal = (account) => {
     setEditingAccount(account);
     setIsModalOpen(true);
   };
@@ -80,18 +88,20 @@ const Accounts = ({ userId, accounts, setAccounts }) => {
         <TableContainer>
           <Table>
             <Thead>
-              <Tr>
+              <TrH>
                 <Th>Name</Th>
                 <Th>Balance</Th>
                 <Th>Actions</Th>
-              </Tr>
+              </TrH>
             </Thead>
             <Tbody>
             {Object.entries(accounts).filter(([id, account]) => account.type === type)
               .map(([id, account]) => (
                 <Tr key={id}>
                   <Td>{account.name}</Td>
-                  <Td>${account.balance}</Td>
+                  <Td style={{ color: account.balance < 0 ? '#c26166' : 'inherit' }}>
+          {formatCurrency(account.balance)}
+        </Td>
                   <Td>
                     <Button onClick={() => openEditModal({ id, ...account })}>Edit</Button>
                     <Button onClick={() => handleDeleteAccount(id)}>Delete</Button>

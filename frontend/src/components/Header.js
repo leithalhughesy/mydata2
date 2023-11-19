@@ -3,7 +3,7 @@ import logo from '../assets/MyDataLogo60px.png';
 import { Navbar, NavList, NavItem, Title, Dropdown, DropdownContent, ProfileImage, HeaderLH, Button } from './StyledComponents';
 import { Link } from 'react-router-dom';
 
-const Header = ({ user, onLogout }) => {
+const Header = ({ user, onLogout, onSettings }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
@@ -23,7 +23,7 @@ const Header = ({ user, onLogout }) => {
                 <ProfileImage src={user.photoURL} alt="Profile" />
                 {isDropdownOpen && (
                   <DropdownContent>
-                    <a href="#settings">Settings</a>
+                    <a href="#settings" onClick={onSettings}>Settings</a>
                     <Button onClick={(e) => {
                     e.preventDefault(); // Prevent default button click behavior
                     onLogout(); // Call the logout function
