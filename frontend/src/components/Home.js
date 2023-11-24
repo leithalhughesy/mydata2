@@ -1,11 +1,12 @@
 import React from 'react';
+import { Container } from './StyledComponents';
 
 const Home = () => {
   return (
-    <div className="App">
+    <Container>
       <h1>Home</h1>
       <p>Work in progress</p>
-    </div>
+    </Container>
   );
 };
 

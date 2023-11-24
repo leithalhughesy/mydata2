@@ -6,7 +6,6 @@ import { database } from '../firebase/firebaseConfig';
 import { ref, set } from 'firebase/database';
 
 const UserSettingsModal = ({ user, isOpen, onClose }) => {
-const { id } = user;
 const currentTheme = useContext(ThemeContext);
 const [selectedTheme, setSelectedTheme] = useState(currentTheme.title);
 const saveSettings = async () => {

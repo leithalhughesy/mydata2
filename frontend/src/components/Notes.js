@@ -1,5 +1,5 @@
 // src/components/Notes.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef,useContext } from 'react';
 import { ref, onValue } from 'firebase/database';
 import { database, auth } from '../firebase/firebaseConfig';
 import { addNote, deleteNote, updateNote, updateNoteOrderInFirebase } from '../firebase/firebaseUtils';
@@ -13,6 +13,7 @@ import {
   Card,
 } from './StyledComponents';
 import 'react-quill/dist/quill.snow.css'; // Import styles
+import { ThemeContext } from 'styled-components';
 
 const Notes = () => {
   const [notes, setNotes] = useState([]);
@@ -21,6 +22,7 @@ const Notes = () => {
   const [noteTitle, setNoteTitle] = useState('');
   const selectedNote = notes.find((note) => note.id === selectedNoteId);
   const initialSelectionMade = useRef(false);
+  const theme = useContext(ThemeContext);
 
   useEffect(() => {
     if (!auth.currentUser) return;
@@ -170,7 +172,7 @@ const onDragEnd = (result) => {
                 autoFocus
               />
               <EditorStyles
-                theme="snow"
+                theme={theme}
                 value={editorContent}
                 onChange={setEditorContent}
               />

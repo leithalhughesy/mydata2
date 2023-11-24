@@ -2,6 +2,7 @@
 import React from 'react';
 import Accounts from './Accounts';
 import Transactions from './Transactions';
+import { Container } from './StyledComponents';
 
 const Finances = ({ user, accounts, setAccounts }) => {
   // Check if user is defined before rendering Accounts and Transactions
@@ -12,10 +13,10 @@ const Finances = ({ user, accounts, setAccounts }) => {
   }
 
   return (
-    <div className="App">
+    <Container>
       <Accounts userId={user.uid} accounts={accounts} setAccounts={setAccounts} />
       <Transactions userId={user.uid} accounts={accounts} />
-    </div>
+    </Container>
   );
 };
 

@@ -9,7 +9,7 @@ import Home from './components/Home';
 import Finances from './components/Finances';
 import ToDo from './components/ToDo';
 import Notes from './components/Notes';
-import { MainContent } from './components/StyledComponents';
+import { GlobalStyle, MainContent } from './components/StyledComponents';
 import Login from './components/Login';
 import UserSettingsModal from './components/UserSettingsModal';
 import { ThemeProvider } from 'styled-components';
@@ -76,6 +76,7 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
+      <GlobalStyle />
       <Router>
         <div className="App">
           <Header user={user} onLogout={handleLogout} onSettings={toggleSettingsModal} />

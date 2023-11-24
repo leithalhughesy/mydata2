@@ -1,9 +1,17 @@
 import styled from 'styled-components';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { createGlobalStyle } from 'styled-components';
+
+export const GlobalStyle = createGlobalStyle`
+  body {
+    background-color: ${(props) => props.theme.body};
+    // You can add other global styles here
+  }
+`;
 
 export const Container = styled.div`
-  max-width: 1200px;
+  color: ${props => props.theme.text}; // Dynamic text color from theme
   margin: 0 auto;
   padding: 0 50px;
 `;
@@ -116,6 +124,7 @@ export const Option = styled.option`
 `;
 
 export const Card = styled.div`
+  color: ${props => props.theme.text}; // Dynamic text color from theme
   background-color: ${props => props.theme.card}; // Dynamic card background color from theme
   border-radius: 10px;
   height: 100%;
@@ -153,7 +162,7 @@ export const Table = styled.table`
 
 export const Thead = styled.thead`
   background-color: ${props => props.theme.primary}; // Dynamic header background color from theme
-  color: ${props => props.theme.text}; // Dynamic text color from theme
+  color: ${props => props.theme.header}; // Dynamic text color from theme
   text-align: left;
   font-weight: bold;
 `;
@@ -194,6 +203,7 @@ export const TableContainer = styled.div`
 `;
 
 export const MainContent = styled.main`
+  background-color: ${props => props.theme.body}; // Dynamic body background color from theme
   padding: 40px;
   padding-top: 150px;
   display: flex;
@@ -366,7 +376,7 @@ export const EditorStyles = styled(ReactQuill)`
 
   .ql-editor {
     padding: 20px;
-    background-color: ${props => props.theme.background}; // Dynamic editor background color from theme
+    background-color: ${props => props.theme.body};
     color: ${props => props.theme.text}; // Dynamic text color from theme
     border-radius: 4px;
     height: 100%;

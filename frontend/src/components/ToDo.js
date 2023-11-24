@@ -1,12 +1,12 @@
 import React from 'react';
-import { DivCenter } from './StyledComponents';
+import { Container } from './StyledComponents';
 
 const ToDo = () => {
   return (
-    <DivCenter>
+    <Container>
       <h1>To Do</h1>
       <p>Work in progress</p>
-    </DivCenter>
+    </Container>
   );
 };
 
