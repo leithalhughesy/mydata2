@@ -1,31 +1,27 @@
-// src/components/Transactions.js
 import React, { useState, useEffect } from 'react';
-import { ref, onValue, push, set } from 'firebase/database';
+import { ref, onValue, push, set, update } from 'firebase/database';
 import { database } from '../firebase/firebaseConfig';
 import { Button, Input, Select, Option, Card, Table, Thead, Tbody, Tr, Th, Td, TableContainer } from './StyledComponents';
+import EditTransactionModal from './EditTransactionModal';
 
 const Transactions = ({ userId, accounts }) => {
   const [transactions, setTransactions] = useState([]);
   const [newTransactionDescription, setNewTransactionDescription] = useState('');
   const [newTransactionAmount, setNewTransactionAmount] = useState('');
-  const [newTransactionAccount, setNewTransactionAccount] = useState('');
+  const [newTransactionFromAccount, setNewTransactionFromAccount] = useState('');
+  const [newTransactionToAccount, setNewTransactionToAccount] = useState('');
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState(null);
 
-  // Effect to listen to transactions updates
   useEffect(() => {
     if (!userId) return;
 
     const transactionsRef = ref(database, `users/${userId}/transactions`);
-    const unsubscribe = onValue(transactionsRef, (snapshot) => {
-      const data = snapshot.val();
-      const transactionsArray = data ? Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      })) : [];
-      setTransactions(transactionsArray);
+    onValue(transactionsRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      setTransactions(Object.entries(data).map(([key, value]) => ({ id: key, ...value })));
     });
-
-    return () => unsubscribe();
-  }, [userId]); // Removed accounts from dependencies as it's not used here
+  }, [userId]);
 
   const handleAddTransaction = async (event) => {
     event.preventDefault();
@@ -33,7 +29,8 @@ const Transactions = ({ userId, accounts }) => {
     const newTransaction = {
       description: newTransactionDescription,
       amount: parseFloat(newTransactionAmount),
-      accountId: newTransactionAccount,
+      fromAccount: newTransactionFromAccount,
+      toAccount: newTransactionToAccount,
       date: new Date().toISOString().split('T')[0],
     };
 
@@ -41,29 +38,42 @@ const Transactions = ({ userId, accounts }) => {
       await set(newTransactionRef, newTransaction);
       setNewTransactionDescription('');
       setNewTransactionAmount('');
-      setNewTransactionAccount('');
+      setNewTransactionFromAccount('');
+      setNewTransactionToAccount('');
     } catch (error) {
       console.error("Error adding transaction: ", error);
+    }
+  };
+
+  const handleEditTransaction = (transaction) => {
+    setEditingTransaction(transaction);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveTransaction = async (updatedTransaction) => {
+    try {
+      await update(ref(database, `users/${userId}/transactions/${updatedTransaction.id}`), updatedTransaction);
+      setIsEditModalOpen(false);
+      setEditingTransaction(null);
+    } catch (error) {
+      console.error("Error updating transaction: ", error);
     }
   };
 
   return (
     <><Card>
           <h2>Transactions</h2>
-          <TableContainer><Table><Thead><Tr><Th>Name</Th><Th>Amount</Th><Th>From</Th></Tr></Thead>
+          <TableContainer><Table><Thead><Tr><Th>Description</Th><Th>Amount</Th><Th>From Account</Th><Th>To Account</Th></Tr></Thead>
               <Tbody>
-                  {/* List of transactions */}
                   {transactions.map((transaction) => (
-                      <Tr key={transaction.id}>
-                          <Td>{transaction.description}</Td><Td>${transaction.amount}</Td><Td>{transaction.accounts}</Td>
-                          {/* Add more details about transaction */}
+                      <Tr key={transaction.id} onClick={() => handleEditTransaction(transaction)}>
+                          <Td>{transaction.description}</Td><Td>${transaction.amount}</Td><Td>{accounts[transaction.fromAccount]?.name}</Td><Td>{accounts[transaction.toAccount]?.name}</Td>
                       </Tr>
                   ))}
               </Tbody>
           </Table></TableContainer>
       </Card><Card>
       <h3>Add new Transaction</h3>
-              {/* This form should always be rendered, so ensure it's outside any conditional logic */}
               <form onSubmit={handleAddTransaction}>
                   <Input
                       type="text"
@@ -77,21 +87,35 @@ const Transactions = ({ userId, accounts }) => {
                       onChange={(e) => setNewTransactionAmount(e.target.value)}
                       placeholder="Amount"
                       required />
-                      <Select
-                          value={newTransactionAccount}
-                          onChange={(e) => setNewTransactionAccount(e.target.value)}
-                          required
-                      >
-                          <option value="">Select Account</option>
-                          {/* Make sure `accounts` is an object with keys as account ids */}
-                          {Object.entries(accounts).map(([id, account]) => (
-                              <Option key={id} value={id}>{account.name}</Option>
-                          ))}
-                      </Select>
+                  <Select
+                      value={newTransactionFromAccount}
+                      onChange={(e) => setNewTransactionFromAccount(e.target.value)}
+                      required
+                  >
+                      <option value="">From Account</option>
+                      {Object.entries(accounts).map(([id, account]) => (
+                          <Option key={id} value={id}>{account.name}</Option>
+                      ))}
+                  </Select>
+                  <Select
+                      value={newTransactionToAccount}
+                      onChange={(e) => setNewTransactionToAccount(e.target.value)}
+                      required
+                  >
+                      <option value="">To Account</option>
+                      {Object.entries(accounts).map(([id, account]) => (
+                          <Option key={id} value={id}>{account.name}</Option>
+                      ))}
+                  </Select>
                   <Button type="submit">Add Transaction</Button>
               </form>
-
-          </Card></>
+          </Card><EditTransactionModal
+            transaction={editingTransaction}
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            onSave={handleSaveTransaction}
+            accounts={accounts}
+          /></>
   );  
 };
 

@@ -1,5 +1,6 @@
 // src/theme.js
 export const lightTheme = {
+    title: 'light', // Add this line
     body: '#FFFFFF', // Light background for the body
     text: '#363537', // Darker text for readability on light background
     toggleBorder: '#FFF', // Lighter toggle border
@@ -17,6 +18,7 @@ export const lightTheme = {
 };
   
 export const darkTheme = {
+    title: 'dark', // Add this line
     body: '#0A192F',
     text: '#CCD6F6',
     toggleBorder: '#6B8096',
@@ -32,4 +34,4 @@ export const darkTheme = {
     modalBackground: 'rgba(0, 0, 0, 0.6)',
     card: '#112240',
   };
-    
+ 

@@ -1,3 +1,4 @@
+// src/firebase/firebaseUils.js
 import { database } from './firebaseConfig';
 import { ref, push, set, update,remove } from 'firebase/database';
 
@@ -18,13 +19,24 @@ export const updateAccount = (userId, accountId, accountUpdate) => {
 // Transactions
 export const addTransaction = (userId, transaction) => {
   const newTransactionRef = push(ref(database, `users/${userId}/transactions`));
-  return set(newTransactionRef, transaction);
+  return set(newTransactionRef, {
+    description: transaction.description,
+    amount: transaction.amount,
+    fromAccount: transaction.fromAccount,
+    toAccount: transaction.toAccount,
+    date: transaction.date
+  });
 };
 
 export const updateTransaction = (userId, transactionId, transactionUpdate) => {
-  return update(ref(database, `users/${userId}/transactions/${transactionId}`), transactionUpdate);
+  return update(ref(database, `users/${userId}/transactions/${transactionId}`), {
+    description: transactionUpdate.description,
+    amount: transactionUpdate.amount,
+    fromAccount: transactionUpdate.fromAccount,
+    toAccount: transactionUpdate.toAccount,
+    date: transactionUpdate.date
+  });
 };
-
 // Notes
 export const addNote = (userId, note) => {
   const newNoteRef = push(ref(database, `users/${userId}/notes`));

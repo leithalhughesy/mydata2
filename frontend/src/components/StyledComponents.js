@@ -8,6 +8,12 @@ export const GlobalStyle = createGlobalStyle`
     background-color: ${(props) => props.theme.body};
     // You can add other global styles here
   }
+  table {
+    width: 100%;
+  }
+  td {
+    width: 25%;
+  }
 `;
 
 export const Container = styled.div`
@@ -20,12 +26,17 @@ export const Navbar = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 0;
+  padding: 0px 0;
 `;
 
 export const NavList = styled.ul`
   list-style: none;
   display: flex;
+`;
+export const NavListSub = styled.ul`
+  list-style: none;
+  display: flex;
+  font-size: .8em;
 `;
 
 export const NavItem = styled.li`
@@ -43,7 +54,7 @@ export const NavItem = styled.li`
 
 export const Button = styled.button`
   background-color: ${props => props.theme.primary}; // Dynamic background color from theme
-  color: ${props => props.theme.text}; // Dynamic text color from theme
+  color: ${props => props.theme.body}; // Dynamic text color from theme
   border: none;
   border-radius: 4px;
   padding: 10px 20px;
@@ -425,34 +436,12 @@ export const ModalContent = styled.div`
   border-radius: 8px;
 `;
 
-export const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-`;
-
 export const Form = styled.form`
   display: flex;
   flex-direction: column;
 `;
 
 export const Label = styled.label`
-  margin-bottom: 5px;
-`;
-
-export const ModalInput = styled.input`
-  margin-bottom: 10px;
-`;
-
-export const ModalSelect = styled.select`
-  margin-bottom: 10px;
-`;
-
-export const ModalButton = styled.button`
-  background-color: ${props => props.theme.primary}; // Dynamic modal button background from theme
   color: ${props => props.theme.text}; // Dynamic text color from theme
-  border: none;
-  padding: 10px;
-  border-radius: 4px;
-  cursor: pointer;
+  margin-bottom: 5px;
 `;

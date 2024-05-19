@@ -1,5 +1,5 @@
 // src/components/Notes.js
-import React, { useState, useEffect, useRef,useContext } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { ref, onValue } from 'firebase/database';
 import { database, auth } from '../firebase/firebaseConfig';
 import { addNote, deleteNote, updateNote, updateNoteOrderInFirebase } from '../firebase/firebaseUtils';
@@ -24,21 +24,24 @@ const Notes = () => {
   const initialSelectionMade = useRef(false);
   const theme = useContext(ThemeContext);
 
+  // Ref for the note title input element
+  const noteTitleInputRef = useRef(null);
+
   useEffect(() => {
     if (!auth.currentUser) return;
-    
+
     const notesRef = ref(database, `users/${auth.currentUser.uid}/notes`);
     const unsubscribe = onValue(notesRef, (snapshot) => {
       const data = snapshot.val();
       let loadedNotes = [];
 
       if (data) {
-          loadedNotes = Object.keys(data).map(key => ({
-              id: key,
-              ...data[key]
-          }));
-          // Sort the notes by the 'order' field
-          loadedNotes.sort((a, b) => a.order - b.order);
+        loadedNotes = Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key],
+        }));
+        // Sort the notes by the 'order' field
+        loadedNotes.sort((a, b) => a.order - b.order);
       }
 
       setNotes(loadedNotes);
@@ -63,24 +66,23 @@ const Notes = () => {
         }
       }
     });
-    
+
     return () => unsubscribe();
- // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [auth.currentUser]); // Only re-run the effect if auth.currentUser changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.currentUser]); // Only re-run the effect if auth.currentUser changes
 
-
-const onDragEnd = (result) => {
-  if (!result.destination) {
+  const onDragEnd = (result) => {
+    if (!result.destination) {
       return; // Dropped outside the list
-  }
+    }
 
-  const reorderedNotes = Array.from(notes);
-  const [removed] = reorderedNotes.splice(result.source.index, 1);
-  reorderedNotes.splice(result.destination.index, 0, removed);
+    const reorderedNotes = Array.from(notes);
+    const [removed] = reorderedNotes.splice(result.source.index, 1);
+    reorderedNotes.splice(result.destination.index, 0, removed);
 
-  setNotes(reorderedNotes); // Update the state
-  updateNoteOrderInFirebase(auth.currentUser.uid, reorderedNotes); // Update Firebase
-};
+    setNotes(reorderedNotes); // Update the state
+    updateNoteOrderInFirebase(auth.currentUser.uid, reorderedNotes); // Update Firebase
+  };
 
   const handleNoteUpdate = async () => {
     if (selectedNoteId) {
@@ -89,29 +91,34 @@ const onDragEnd = (result) => {
         title: noteTitle,
         content: editorContent,
       });
+
+      // Focus the note title input after update
+      if (noteTitleInputRef.current) {
+        noteTitleInputRef.current.focus();
+      }
     } else {
       // If there's no selected note, create a new one
       handleAddNewNote();
     }
   };
-  
+
   const handleAddNewNote = async () => {
     // Create a new note object with an order value
     const newNote = {
       title: 'New Note Title', // Default title for new note
       content: 'Notes go here', // Default content for new note
-      order: notes.length // Set the order to be the last in the list
+      order: notes.length, // Set the order to be the last in the list
     };
-  
+
     // Push the new note to Firebase
     const newNoteRef = await addNote(auth.currentUser.uid, newNote);
-  
+
     // Use the key from the new note reference to set the selected note ID
     if (newNoteRef.key) {
       setSelectedNoteId(newNoteRef.key);
       setEditorContent(newNote.content);
       setNoteTitle(newNote.title);
-  
+
       // Update the notes array with the new note
       setNotes([...notes, { id: newNoteRef.key, ...newNote }]);
     }
@@ -126,11 +133,11 @@ const onDragEnd = (result) => {
 
   const handleNoteDelete = async (noteId) => {
     await deleteNote(auth.currentUser.uid, noteId);
-  
+
     if (selectedNoteId === noteId) {
       const noteIndex = notes.findIndex((note) => note.id === noteId);
       let nextNote = null;
-  
+
       // Check if there is a note after the deleted note
       if (noteIndex < notes.length - 1) {
         nextNote = notes[noteIndex + 1];
@@ -139,7 +146,7 @@ const onDragEnd = (result) => {
       else if (noteIndex > 0) {
         nextNote = notes[noteIndex - 1];
       }
-  
+
       // Update the state to reflect the new selection
       if (nextNote) {
         setSelectedNoteId(nextNote.id);
@@ -165,6 +172,7 @@ const onDragEnd = (result) => {
           {selectedNote && (
             <>
               <NoteTitleInput
+                ref={noteTitleInputRef} // Add the ref here
                 type="text"
                 value={noteTitle}
                 onChange={(e) => setNoteTitle(e.target.value)}
@@ -178,7 +186,9 @@ const onDragEnd = (result) => {
               />
               <div>
                 <Button onClick={handleNoteUpdate}>Save</Button>
-                <Button onClick={() => handleNoteDelete(selectedNote.id)}>Delete</Button>
+                <Button onClick={() => handleNoteDelete(selectedNote.id)}>
+                  Delete
+                </Button>
               </div>
             </>
           )}

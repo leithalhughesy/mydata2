@@ -1,6 +1,6 @@
 // src/components/EditAccountModal.js
 import React, { useState, useEffect } from 'react';
-import { ModalContainer, ModalContent, CloseButton, Form, Label, ModalInput, ModalSelect, ModalButton } from './StyledComponents';
+import { ModalContainer, ModalContent, Form, Label, Select, Button, Input } from './StyledComponents';
 
 const EditAccountModal = ({ account, isOpen, onClose, onSave }) => {
   const [name, setName] = useState('');
@@ -25,20 +25,21 @@ const EditAccountModal = ({ account, isOpen, onClose, onSave }) => {
   return (
     <ModalContainer>
       <ModalContent>
-        <CloseButton onClick={onClose}>X</CloseButton>
         <Form onSubmit={handleSubmit}>
           <Label>Name:</Label>
-          <ModalInput value={name} onChange={(e) => setName(e.target.value)} />
+          <Input value={name} onChange={(e) => setName(e.target.value)} />
           <Label>Balance:</Label>
-          <ModalInput type="number" value={balance} onChange={(e) => setBalance(e.target.value)} />
+          <Input type="number" value={balance} onChange={(e) => setBalance(e.target.value)} />
           <Label>Type:</Label>
-          <ModalSelect value={type} onChange={(e) => setType(e.target.value)}>
+          <Select value={type} onChange={(e) => setType(e.target.value)}>
             <option value="Bank">Bank</option>
+            <option value="Loan">Loan</option>
             <option value="Asset">Asset</option>
             <option value="Income">Income</option>
             <option value="Expense">Expense</option>
-          </ModalSelect>
-          <ModalButton type="submit">Save Changes</ModalButton>
+          </Select>
+          <Button type="submit">Save Changes</Button>
+          <Button onClick={onClose}>Close</Button>
         </Form>
       </ModalContent>
     </ModalContainer>

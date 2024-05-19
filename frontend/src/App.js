@@ -1,39 +1,31 @@
 // src/App.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { ref, onValue, set } from 'firebase/database';
+import { ref, onValue,  set } from 'firebase/database';
 import { auth, database } from './firebase/firebaseConfig';
 import Header from './components/Header';
 import Home from './components/Home';
-import Finances from './components/Finances';
 import ToDo from './components/ToDo';
 import Notes from './components/Notes';
-import { GlobalStyle, MainContent } from './components/StyledComponents';
 import Login from './components/Login';
 import UserSettingsModal from './components/UserSettingsModal';
-import { ThemeProvider } from 'styled-components';
-import { lightTheme, darkTheme } from './theme'; // Import the themes
+import { ThemeProvider as StyledThemeProvider } from 'styled-components';
+import { ThemeContext } from './context/ThemeContext';
+import { GlobalStyle, MainContent } from './components/StyledComponents';
+import Accounts from './components/Accounts';
+import Transactions from './components/Transactions';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [accounts, setAccounts] = useState({});
-  const [theme, setTheme] = useState(darkTheme); // Default to dark theme
+  const [accounts, setAccounts] = useState({}); // Define accounts state
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-
-  // Monitor auth state and fetch accounts when user logs in
+  const { theme, updateTheme } = useContext(ThemeContext);
+ 
+  // Monitor auth state
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      if (currentUser) {
-        // Fetch accounts
-        const accountsRef = ref(database, `users/${currentUser.uid}/accounts`);
-        onValue(accountsRef, (snapshot) => {
-          setAccounts(snapshot.val() || {});
-        });
-      } else {
-        setAccounts({});
-      }
     });
 
     // Cleanup function to unsubscribe from the auth listener on component unmount
@@ -46,15 +38,30 @@ function App() {
       onValue(settingsRef, (snapshot) => {
         if (snapshot.exists()) {
           const userSettings = snapshot.val();
-          setTheme(userSettings.theme === 'light' ? lightTheme : darkTheme);
+          updateTheme(userSettings.theme === 'light' ? 'light' : 'dark');
         } else {
-          // Set default theme in database for new users
           set(settingsRef, { theme: 'dark' });
-          setTheme(darkTheme);
+          updateTheme('dark');
         }
       }, {
         onlyOnce: true
       });
+    }
+  }, [user, updateTheme]);
+
+  useEffect(() => {
+    if (user) {
+      const accountsRef = ref(database, `users/${user.uid}/accounts`);
+      onValue(accountsRef, (snapshot) => {
+        const data = snapshot.val();
+        const formattedAccounts = data ? Object.entries(data).reduce((acc, [key, value]) => {
+          acc[key] = value;
+          return acc;
+        }, {}) : {};
+        setAccounts(formattedAccounts);
+      });
+    } else {
+      setAccounts({});
     }
   }, [user]);
 
@@ -69,13 +76,8 @@ function App() {
     }
   };
 
-  const updateTheme = (newTheme) => {
-    setTheme(newTheme === 'light' ? lightTheme : darkTheme);
-  };
-  
-
   return (
-    <ThemeProvider theme={theme}>
+    <StyledThemeProvider theme={theme}>
       <GlobalStyle />
       <Router>
         <div className="App">
@@ -84,9 +86,11 @@ function App() {
             {user ? (
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/finances" element={user ? <Finances user={user} accounts={accounts} setAccounts={setAccounts} /> : <Login />}/>
+                <Route path="/accounts" element={<Accounts userId={user?.uid} accounts={accounts}/>} />
                 <Route path="/todo" element={<ToDo />} />
                 <Route path="/notes" element={<Notes />} />
+                <Route path="/accounts" element={<Accounts userId={user?.uid} accounts={accounts}/>} />
+                <Route path="/transactions" element={<Transactions userId={user?.uid} accounts={accounts}/>} />
               </Routes>
             ) : (
               <Login />
@@ -97,13 +101,13 @@ function App() {
                 isOpen={isSettingsModalOpen}
                 onClose={toggleSettingsModal}
                 updateTheme={updateTheme}
-                currentTheme={theme.title} // Assuming your theme object has a title property
+                currentTheme={theme.title}
               />
             )}          
           </MainContent>
         </div>
       </Router>
-    </ThemeProvider>
+    </StyledThemeProvider>
   );
 }
 
