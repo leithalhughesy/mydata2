@@ -33,6 +33,7 @@ export const NavList = styled.ul`
   list-style: none;
   display: flex;
 `;
+
 export const NavListSub = styled.ul`
   list-style: none;
   display: flex;
@@ -203,10 +204,16 @@ export const TrH = styled(Tr)``; // You can extend Tr if you want to change some
 
 export const Th = styled.th`
   padding: 12px 15px;
+  white-space: nowrap; // Prevent header text from wrapping
+  text-overflow: ellipsis; // Add ellipsis if text overflows
+  overflow: hidden; // Hide overflow text
 `;
 
 export const Td = styled.td`
   padding: 12px 15px;
+  white-space: nowrap; // Prevent cell text from wrapping
+  text-overflow: ellipsis; // Add ellipsis if text overflows
+  overflow: hidden; // Hide overflow text
 `;
 
 export const TableContainer = styled.div`

@@ -1,4 +1,3 @@
-// src/components/Accounts.js
 import React, { useState } from 'react';
 import { addAccount, deleteAccount, updateAccount } from '../firebase/firebaseUtils';
 import { Button, Card, Table, Thead, Tbody, Tr, Th, Td, TrH, TableContainer, AccountsContainer } from './StyledComponents';
@@ -34,9 +33,7 @@ const Accounts = ({ userId, accounts, setAccounts }) => {
     setIsAddModalOpen(false);
     try {
       await addAccount(userId, newAccount);
-      // Fetch updated accounts list
       const accountsRef = ref(database, `users/${userId}/accounts`);
-      
       onValue(accountsRef, (snapshot) => {
         const data = snapshot.val() || {};
         setAccounts(Object.entries(data).reduce((acc, [key, value]) => {
@@ -91,7 +88,6 @@ const Accounts = ({ userId, accounts, setAccounts }) => {
         onSave={handleAddNewAccount}
         accountType={newAccountType}
       />
-
       <AccountsContainer>
         {['Bank', 'Loan', 'Asset'].map((type) => (
           <Card key={type}>
@@ -106,16 +102,16 @@ const Accounts = ({ userId, accounts, setAccounts }) => {
                   </TrH>
                 </Thead>
                 <Tbody>
-                {Object.entries(accounts || {}).filter(([id, account]) => account.type === type)
-                     .map(([id, account]) => (
-                      <Tr key={id}>
+                  {Object.entries(accounts || {}).filter(([id, account]) => account.type === type)
+                    .map(([id, account]) => (
+                      <Tr key={id} onClick={() => openEditModal({ id, ...account })}>
                         <Td>{account.name}</Td>
                         <Td style={{ color: account.balance < 0 ? '#c26166' : 'inherit' }}>
                           {formatCurrency(account.balance)}
                         </Td>
                         <Td>
-                          <Button onClick={() => openEditModal({ id, ...account })}>Edit</Button>
-                          <Button onClick={() => handleDeleteAccount(id)}>Delete</Button>
+                          <Button onClick={(e) => { e.stopPropagation(); openEditModal({ id, ...account }); }}>Edit</Button>
+                          <Button onClick={(e) => { e.stopPropagation(); handleDeleteAccount(id); }}>Delete</Button>
                         </Td>
                       </Tr>
                     ))}
