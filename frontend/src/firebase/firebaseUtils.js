@@ -1,6 +1,5 @@
-// src/firebase/firebaseUils.js
 import { database } from './firebaseConfig';
-import { ref, push, set, update,remove } from 'firebase/database';
+import { ref, push, set, update, remove, get } from 'firebase/database';
 
 // Accounts
 export const addAccount = (userId, account) => {
@@ -19,24 +18,51 @@ export const updateAccount = (userId, accountId, accountUpdate) => {
 // Transactions
 export const addTransaction = (userId, transaction) => {
   const newTransactionRef = push(ref(database, `users/${userId}/transactions`));
-  return set(newTransactionRef, {
-    description: transaction.description,
-    amount: transaction.amount,
-    fromAccount: transaction.fromAccount,
-    toAccount: transaction.toAccount,
-    date: transaction.date
-  });
+  return set(newTransactionRef, transaction);
 };
 
-export const updateTransaction = (userId, transactionId, transactionUpdate) => {
-  return update(ref(database, `users/${userId}/transactions/${transactionId}`), {
-    description: transactionUpdate.description,
-    amount: transactionUpdate.amount,
-    fromAccount: transactionUpdate.fromAccount,
-    toAccount: transactionUpdate.toAccount,
-    date: transactionUpdate.date
-  });
+export const updateTransaction = (userId, transactionId, transactionUpdate, parentId = null) => {
+  const transactionRef = parentId
+    ? ref(database, `users/${userId}/transactions/${parentId}/childTransactions/${transactionId}`)
+    : ref(database, `users/${userId}/transactions/${transactionId}`);
+  return update(transactionRef, transactionUpdate);
 };
+
+export const addRecurringTransaction = async (userId, transaction) => {
+  const newTransactionRef = push(ref(database, `users/${userId}/transactions`));
+  await set(newTransactionRef, transaction);
+  return newTransactionRef;
+};
+
+export const addChildTransaction = (userId, parentId, transaction) => {
+  const newChildTransactionRef = push(ref(database, `users/${userId}/transactions/${parentId}/childTransactions`));
+  return set(newChildTransactionRef, transaction);
+};
+
+export const deleteTransaction = async (userId, transactionId, parentId = null) => {
+  const transactionRef = parentId 
+    ? ref(database, `users/${userId}/transactions/${parentId}/childTransactions/${transactionId}`) 
+    : ref(database, `users/${userId}/transactions/${transactionId}`);
+  await remove(transactionRef);
+};
+
+export const deleteRecurringTransaction = async (userId, parentId) => {
+  const parentTransactionRef = ref(database, `users/${userId}/transactions/${parentId}`);
+  const snapshot = await get(parentTransactionRef);
+  const parentTransactionData = snapshot.val();
+
+  if (parentTransactionData && parentTransactionData.childTransactions) {
+    const updates = {};
+    Object.keys(parentTransactionData.childTransactions).forEach(childId => {
+      updates[`users/${userId}/transactions/${parentId}/childTransactions/${childId}`] = null;
+    });
+    updates[`users/${userId}/transactions/${parentId}`] = null;
+    await update(ref(database), updates);
+  } else {
+    await remove(parentTransactionRef);
+  }
+};
+
 // Notes
 export const addNote = (userId, note) => {
   const newNoteRef = push(ref(database, `users/${userId}/notes`));
@@ -55,14 +81,13 @@ export const deleteNote = (userId, noteId) => {
 export const updateNoteOrderInFirebase = async (userId, reorderedNotes) => {
   const updates = {};
   reorderedNotes.forEach((note, index) => {
-      const noteKey = note.id; // Assuming 'id' is the Firebase key for the note
-      updates[`/users/${userId}/notes/${noteKey}/order`] = index;
+    const noteKey = note.id;
+    updates[`/users/${userId}/notes/${noteKey}/order`] = index;
   });
 
   try {
-      await update(ref(database), updates); // Perform the update
+    await update(ref(database), updates);
   } catch (error) {
-      console.error("Error updating note order: ", error);
+    console.error("Error updating note order: ", error);
   }
 };
-
