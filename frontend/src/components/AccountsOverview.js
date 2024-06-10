@@ -65,15 +65,27 @@ const AccountsOverview = ({ userId }) => {
   const calculateAccountBalances = (transactions, accounts) => {
     const accountBalances = {};
     Object.keys(accounts).forEach(accountId => {
-      accountBalances[accountId] = 0;
+      accountBalances[accountId] = [];
     });
 
-    transactions.forEach(transaction => {
-      if (transaction.fromAccount && accountBalances[transaction.fromAccount] !== undefined) {
-        accountBalances[transaction.fromAccount] -= parseFloat(transaction.amount);
+    const sortedTransactions = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    sortedTransactions.forEach(transaction => {
+      const transactionDate = new Date(transaction.date).toLocaleDateString();
+      Object.keys(accounts).forEach(accountId => {
+        if (accountBalances[accountId].length === 0) {
+          accountBalances[accountId].push({ date: transactionDate, balance: parseFloat(accounts[accountId].balance) });
+        } else {
+          const lastBalance = accountBalances[accountId][accountBalances[accountId].length - 1].balance;
+          accountBalances[accountId].push({ date: transactionDate, balance: lastBalance });
+        }
+      });
+
+      if (transaction.fromAccount && accountBalances[transaction.fromAccount]) {
+        accountBalances[transaction.fromAccount][accountBalances[transaction.fromAccount].length - 1].balance -= parseFloat(transaction.amount);
       }
-      if (transaction.toAccount && accountBalances[transaction.toAccount] !== undefined) {
-        accountBalances[transaction.toAccount] += parseFloat(transaction.amount);
+      if (transaction.toAccount && accountBalances[transaction.toAccount]) {
+        accountBalances[transaction.toAccount][accountBalances[transaction.toAccount].length - 1].balance += parseFloat(transaction.amount);
       }
     });
 
@@ -82,13 +94,13 @@ const AccountsOverview = ({ userId }) => {
 
   const filteredTransactions = filterTransactionsByDate(transactions, selectedTimePeriod);
 
+  const accountBalancesOverTime = calculateAccountBalances(filteredTransactions, accounts);
+
   const data = {
-    labels: filteredTransactions.map(transaction => new Date(transaction.date).toLocaleDateString()),
-    datasets: Object.entries(calculateAccountBalances(filteredTransactions, accounts)).map(([accountId, balance]) => ({
+    labels: Array.from(new Set(filteredTransactions.map(transaction => new Date(transaction.date).toLocaleDateString()))),
+    datasets: Object.entries(accountBalancesOverTime).map(([accountId, balanceEntries]) => ({
       label: accounts[accountId]?.name || accountId,
-      data: filteredTransactions
-        .filter(transaction => transaction.fromAccount === accountId || transaction.toAccount === accountId)
-        .map(transaction => balance),
+      data: balanceEntries.map(entry => entry.balance),
       fill: false,
       borderColor: 'rgba(75,192,192,1)',
       tension: 0.1,
