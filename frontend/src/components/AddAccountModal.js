@@ -1,4 +1,3 @@
-// src/components/AddAccountModal.js
 import React, { useState } from 'react';
 import { ModalContainer, ModalContent, Form, Label, Button, Input } from './StyledComponents';
 

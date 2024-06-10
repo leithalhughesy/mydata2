@@ -89,7 +89,7 @@ const Accounts = ({ userId, accounts, setAccounts }) => {
         accountType={newAccountType}
       />
       <AccountsContainer>
-        {['Bank', 'Loan', 'Asset'].map((type) => (
+        {['Bank', 'Loan', 'Asset', 'Expense', 'Income'].map((type) => (
           <Card key={type}>
             <h2>{type} Accounts <Button onClick={() => openAddModal(type)}>+</Button></h2>
             <TableContainer>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { get, ref } from 'firebase/database';
 import { database } from '../firebase/firebaseConfig';
-import { Button } from './StyledComponents';
+import { Button, Card, AccountsContainer, TableContainer } from './StyledComponents';
 import 'chart.js/auto';
 
 const timePeriods = [
@@ -108,25 +108,27 @@ const AccountsOverview = ({ userId }) => {
   };
 
   return (
-    <div>
-      <h2>Overview</h2>
-      <div>
-        {timePeriods.map(period => (
-          <Button
-            key={period.label}
-            onClick={() => handleTimePeriodChange(period.value)}
-            style={{
-              backgroundColor: selectedTimePeriod === period.value ? '#4CAF50' : '',
-            }}
-          >
-            {period.label}
-          </Button>
-        ))}
-      </div>
-      <div>
-        <Line data={data} />
-      </div>
-    </div>
+    <AccountsContainer>
+      <Card>
+        <h2>Overview</h2>
+        <div>
+          {timePeriods.map(period => (
+            <Button
+              key={period.label}
+              onClick={() => handleTimePeriodChange(period.value)}
+              style={{
+                backgroundColor: selectedTimePeriod === period.value ? '#4CAF50' : '',
+              }}
+            >
+              {period.label}
+            </Button>
+          ))}
+        </div>
+        <TableContainer>
+          <Line data={data} />
+        </TableContainer>
+      </Card>
+    </AccountsContainer>
   );
 };
 
