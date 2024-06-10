@@ -28,6 +28,8 @@ const EditTransactionModal = ({ transaction, isOpen, onClose, onSave, accounts, 
       setToAccount(transaction.toAccount || '');
       setDate(transaction.date ? new Date(transaction.date).toISOString().split('T')[0] : ''); // Ensure date is in the correct format
 
+      setEditMode('single'); // Always default to 'single' edit mode
+
       if (transaction.parentId) {
         fetchParentData(transaction.parentId).then(parentData => {
           if (parentData) {
@@ -41,8 +43,6 @@ const EditTransactionModal = ({ transaction, isOpen, onClose, onSave, accounts, 
         setRecurrenceEndDate(transaction.recurrenceEndDate ? new Date(transaction.recurrenceEndDate).toISOString().split('T')[0] : ''); // Ensure date is in the correct format
         setRecurrenceInterval(transaction.recurrenceInterval || 1);
       }
-
-      setEditMode(transaction.parentId ? 'series' : 'single'); // Determine if the transaction is part of a series
     }
   }, [transaction, userId]); // Add userId to the dependency array
 
@@ -101,7 +101,7 @@ const EditTransactionModal = ({ transaction, isOpen, onClose, onSave, accounts, 
               </Select>
             </>
           )}
-          {(editMode === 'series' || recurrence) && (
+          {(editMode === 'series') && (
             <>
               <Label>Recurrence:</Label>
               <Select value={recurrence} onChange={handleRecurrenceChange}>

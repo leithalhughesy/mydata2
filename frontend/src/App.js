@@ -1,8 +1,7 @@
-// src/App.js
 import React, { useState, useEffect, useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Import Navigate
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { ref, onValue,  set } from 'firebase/database';
+import { ref, onValue, set } from 'firebase/database';
 import { auth, database } from './firebase/firebaseConfig';
 import Header from './components/Header';
 import Home from './components/Home';
@@ -15,6 +14,7 @@ import { ThemeContext } from './context/ThemeContext';
 import { GlobalStyle, MainContent } from './components/StyledComponents';
 import Accounts from './components/Accounts';
 import Transactions from './components/Transactions';
+import AccountsOverview from './components/AccountsOverview'; // Import AccountsOverview
 
 function App() {
   const [user, setUser] = useState(null);
@@ -86,11 +86,12 @@ function App() {
             {user ? (
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/overview" element={<AccountsOverview userId={user?.uid} />} /> {/* Default route */}
                 <Route path="/accounts" element={<Accounts userId={user?.uid} accounts={accounts}/>} />
                 <Route path="/todo" element={<ToDo />} />
                 <Route path="/notes" element={<Notes />} />
-                <Route path="/accounts" element={<Accounts userId={user?.uid} accounts={accounts}/>} />
                 <Route path="/transactions" element={<Transactions userId={user?.uid} accounts={accounts}/>} />
+                <Route path="*" element={<Navigate to="/overview" />} /> {/* Redirect unknown routes */}
               </Routes>
             ) : (
               <Login />

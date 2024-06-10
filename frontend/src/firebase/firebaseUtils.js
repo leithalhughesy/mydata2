@@ -56,12 +56,17 @@ export const deleteRecurringTransaction = async (userId, parentId) => {
     Object.keys(parentTransactionData.childTransactions).forEach(childId => {
       updates[`users/${userId}/transactions/${parentId}/childTransactions/${childId}`] = null;
     });
-    updates[`users/${userId}/transactions/${parentId}`] = null;
+
+    // Perform the child transactions deletion first
     await update(ref(database), updates);
+
+    // Then remove the parent transaction
+    await remove(parentTransactionRef);
   } else {
     await remove(parentTransactionRef);
   }
 };
+
 
 // Notes
 export const addNote = (userId, note) => {
